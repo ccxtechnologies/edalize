@@ -40,6 +40,7 @@ class Radiant(Edatool):
         (src_files, incdirs) = self._get_fileset_files()
         pdc_file = None
         sty_file = None
+        rvl_file = None
         prj_name = self.name.replace(".", "_")
         for f in src_files:
             if f.file_type == "PDC":
@@ -49,13 +50,20 @@ class Radiant(Edatool):
                     )
                 else:
                     pdc_file = f.name
-            if f.file_type == "STY":
+            elif f.file_type == "STY":
                 if sty_file:
                     logger.warning(
                             "Multiple STY files detected. Only the first one will be used"
                     )
                 else:
                     sty_file = f.name
+            elif f.file_type == "RVL":
+                if rvl_file:
+                    logger.warning(
+                            "Multiple RVL files detected. Only the first one will be used"
+                    )
+                else:
+                    rvl_file = f.name
 
         if "synthesis" not in self.tool_options:
             logger.warning("No synthesis tool defined, using synplify")
@@ -145,6 +153,7 @@ prj_close
                 "systemVerilogSource": "prj_add_source ",
                 "vhdlSource": "prj_add_source ",
                 "PDC": "prj_add_source ",
+                "RVL": "prj_add_source ",
         }
         _file_type = get_file_type(f)
         if _file_type in file_types:
@@ -153,7 +162,7 @@ prj_close
             return "prj_import_strategy -name default -file " + f.name + "\nprj_set_strategy default"
         elif _file_type == "tclSource":
             return "source " + f.name
-        elif _file_type in ["user", "LPF"]:
+        elif _file_type in ["user", "LPF", "RVS"]:
             return ""
         else:
             _s = "{} has unknown file type '{}'"
