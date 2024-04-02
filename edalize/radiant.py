@@ -39,9 +39,11 @@ class Radiant(Edatool):
     def configure_main(self):
         (src_files, incdirs) = self._get_fileset_files()
         pdc_file = None
+        sdc_file = None
         sty_file = None
         rvl_file = None
         prj_name = self.name.replace(".", "_")
+
         for f in src_files:
             if f.file_type == "PDC":
                 if pdc_file:
@@ -50,6 +52,13 @@ class Radiant(Edatool):
                     )
                 else:
                     pdc_file = f.name
+            elif f.file_type == "SDC":
+                if sdc_file:
+                    logger.warning(
+                            "Multiple SDC files detected. Only the first one will be used"
+                    )
+                else:
+                    sdc_file = f.name
             elif f.file_type == "STY":
                 if sty_file:
                     logger.warning(
@@ -153,6 +162,7 @@ prj_close
                 "systemVerilogSource": "prj_add_source ",
                 "vhdlSource": "prj_add_source ",
                 "PDC": "prj_add_source ",
+                "SDC": "prj_add_source ",
                 "RVL": "prj_add_source ",
         }
         _file_type = get_file_type(f)
